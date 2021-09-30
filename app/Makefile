@@ -49,6 +49,8 @@ endif
 
 COMPONENTS_eagle.app.v6 = \
 	user/libuser.a  \
+	zlib/mqtt/libmqtt.a		\
+	zlib/cJson/libcJson.a		\
 	zlib/zlib.a		\
 	driver/libdriver.a
 
@@ -122,7 +124,7 @@ DDEFINES +=				\
 # Required for each makefile to inherit from the parent
 #
 
-INCLUDES := $(INCLUDES) -I $(PDIR)include -I $(PDIR)zlib -I $(PDIR)user  -I $(PDIR)driver/include/driver
+INCLUDES := $(INCLUDES) -I $(PDIR)include -I $(PDIR)zlib -I $(PDIR)user  -I $(PDIR)driver/include/driver  -I $(PDIR)zlib/cJson -I $(PDIR)zlib/mqtt -I $(PDIR)zlib/mqtt/include
 PDIR := ../$(PDIR)
 sinclude $(PDIR)Makefile
 
