@@ -30,6 +30,7 @@
 #include "user_interface.h"
 #include "driver/uart.h"
 #include "driver/uart_register.h"
+#include "user_uart.h"
 
 // UartDev is defined and initialized in rom code.
 extern UartDevice    UartDev;
@@ -308,7 +309,8 @@ uart_recvTask(os_event_t *events)
 
         for (idx = 0; idx < fifo_len; idx++) {
             d_tmp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
-            uart_tx_one_char(UART0, d_tmp);
+            //uart_tx_one_char(UART0, d_tmp);
+            user_uart_receive(d_tmp);   //处理接收到的数据
         }
 
         WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR | UART_RXFIFO_TOUT_INT_CLR);
