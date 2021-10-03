@@ -600,7 +600,7 @@ sntp_asctime(struct tm *tim_p)
 uint64 sntp_get_current_timestamp()
 {
 	if(realtime_stamp == 0){
-		os_printf("please start sntp first !\n");
+		//os_printf("please start sntp first !\n");
 		return 0;
 	} else {
 		return realtime_stamp;
