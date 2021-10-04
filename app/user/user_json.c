@@ -43,7 +43,7 @@ static void ICACHE_FLASH_ATTR _json_deal_cb(void *arg, Wifi_Comm_type_t type, cJ
     cJSON *p_mac = cJSON_GetObjectItem(pJsonRoot, "mac");
 
     if((p_mac && cJSON_IsString(p_mac) && os_strcmp(p_mac->valuestring, zlib_wifi_get_mac_str()) != 0)
-            && (p_mac && cJSON_IsString(p_mac) && os_strcmp(p_mac->valuestring, TYPE_NAME) != 0)) return;
+            && (p_mac && cJSON_IsString(p_mac) && os_strcmp(p_mac->valuestring, strlwr(TYPE_NAME)) != 0)) return;
 
     cJSON *json_send = cJSON_CreateObject();
     //mac字段

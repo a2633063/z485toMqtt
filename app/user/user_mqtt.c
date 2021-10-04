@@ -21,7 +21,7 @@ static char willtopic[MAX_MQTT_TOPIC_SIZE];
 
 bool ICACHE_FLASH_ATTR _user_mqtt_received_cb(uint32_t *arg, const char* topic, const char *data)
 {
-    zlib_mqtt_send_message(topic, "", 1, 1);
+    if(os_strlen(data) > 0) zlib_mqtt_send_message(topic, "", 1, 1);
     return true;
 }
 
@@ -42,11 +42,10 @@ void ICACHE_FLASH_ATTR user_mqtt_init(void)
     os_sprintf(topic_sensor, MQTT_CLIENT_SENSOR_TOPIC, strlwr(TYPE_NAME), zlib_wifi_get_mac_str());
     os_sprintf(willtopic, MQTT_CLIENT_WILL_TOPIC, strlwr(TYPE_NAME), zlib_wifi_get_mac_str());
 
-    os_printf("topic_set:%s\n",topic_set);
-    os_printf("topic_state:%s\n",topic_state);
-    os_printf("topic_sensor:%s\n",topic_sensor);
-    os_printf("willtopic:%s\n",willtopic);
-
+    os_printf("topic_set:%s\n", topic_set);
+    os_printf("topic_state:%s\n", topic_state);
+    os_printf("topic_sensor:%s\n", topic_sensor);
+    os_printf("willtopic:%s\n", willtopic);
 
     mqtt_connect_info_t mqtt_info;
     mqtt_info.client_id = zlib_wifi_get_mac_str();
@@ -72,7 +71,7 @@ void ICACHE_FLASH_ATTR user_mqtt_init(void)
 
     zlib_mqtt_set_online_message(message, sizeof(message) / sizeof(zlib_mqtt_message_info_t));
     zlib_mqtt_subscribe(mqtt_topic, sizeof(mqtt_topic) / sizeof(zlib_mqtt_topic_info_t));
-    //zlib_mqtt_set_received_callback(_user_mqtt_received_cb);//是否清楚set主题的retain数据
+    zlib_mqtt_set_received_callback(_user_mqtt_received_cb); //是否清楚set主题的retain数据
     os_printf("user mqtt init\n");
 }
 
