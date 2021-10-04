@@ -57,7 +57,7 @@ static void ICACHE_FLASH_ATTR _json_deal_cb(void *arg, Wifi_Comm_type_t type, cJ
         if(wifi_station_get_config(&ssidGet))
         {
             cJSON_AddStringToObject(json_send, "ssid", ssidGet.ssid);
-            cJSON_AddStringToObject(json_send, "rssi", ssidGet.threshold.rssi);
+            cJSON_AddNumberToObject(json_send, "rssi", ssidGet.threshold.rssi);
         }
         else
         {
@@ -182,7 +182,7 @@ static void ICACHE_FLASH_ATTR _json_deal_cb(void *arg, Wifi_Comm_type_t type, cJ
 
     char *json_str = cJSON_Print(json_send);
     os_printf("json_send: %s\r\n", json_str);
-    zlib_fun_wifi_send(arg, type, user_get_state_topic(), json_str, 1, retained);
+    zlib_fun_wifi_send(arg, type, user_mqtt_get_state_topic(), json_str, 1, retained);
     cJSON_free((void *) json_str);
 
 }
