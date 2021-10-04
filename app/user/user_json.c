@@ -49,6 +49,14 @@ static void ICACHE_FLASH_ATTR _json_deal_cb(void *arg, Wifi_Comm_type_t type, cJ
     //mac字段
     cJSON_AddStringToObject(json_send, "mac", zlib_wifi_get_mac_str());
 
+    //重启命令
+    if(p_cmd && cJSON_IsString(p_cmd) && strcmp(p_cmd->valuestring, "restart") == 0)
+    {
+        os_printf("cmd:restart");
+        zlib_reboot_delay(2000);
+        cJSON_AddStringToObject(json_send, "cmd", "restart");
+    }
+
     //返回wifi ssid及rssi
     cJSON *p_ssid = cJSON_GetObjectItem(pJsonRoot, "ssid");
     if(p_ssid)
