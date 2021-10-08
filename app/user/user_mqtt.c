@@ -19,7 +19,8 @@ static char topic_set[MAX_MQTT_TOPIC_SIZE];
 static char topic_sensor[MAX_MQTT_TOPIC_SIZE];
 static char willtopic[MAX_MQTT_TOPIC_SIZE];
 
-bool ICACHE_FLASH_ATTR _user_mqtt_received_cb(uint32_t *arg, const char* topic, const char *data)
+bool ICACHE_FLASH_ATTR _user_mqtt_received_cb(uint32_t *arg, const char* topic, uint32_t topic_len, const char *data,
+        uint32_t data_len)
 {
     if(os_strlen(data) > 0) zlib_mqtt_send_message(topic, "", 1, 1);
     return true;

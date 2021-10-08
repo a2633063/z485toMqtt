@@ -29,6 +29,12 @@ static void ICACHE_FLASH_ATTR _json_deal_cb(void *arg, Wifi_Comm_type_t type, cJ
         cJSON_AddStringToObject(pRoot, "mac", zlib_wifi_get_mac_str());
         cJSON_AddNumberToObject(pRoot, "type", TYPE);
         cJSON_AddStringToObject(pRoot, "type_name", TYPE_NAME);
+
+        char json_temp_str[64] = { 0 };
+        os_sprintf(json_temp_str, "[\"%s\",\"%s\",\"%s\",\"%s\"]", user_mqtt_get_state_topic(),
+                user_mqtt_get_set_topic(), user_mqtt_get_sensor_topic(), user_mqtt_get_will_topic());
+        cJSON_AddItemToObject(pRoot, "topic", cJSON_Parse(json_temp_str));
+
         char *s = cJSON_Print(pRoot);
         os_printf("pRoot: [%s]\r\n", s);
 
@@ -43,7 +49,8 @@ static void ICACHE_FLASH_ATTR _json_deal_cb(void *arg, Wifi_Comm_type_t type, cJ
     cJSON *p_mac = cJSON_GetObjectItem(pJsonRoot, "mac");
 
     if((p_mac && cJSON_IsString(p_mac) && os_strcmp(p_mac->valuestring, zlib_wifi_get_mac_str()) != 0)
-            && (p_mac && cJSON_IsString(p_mac) && os_strcmp(p_mac->valuestring, strlwr(TYPE_NAME)) != 0)) return;
+            && (p_mac && cJSON_IsString(p_mac) && os_strcmp(p_mac->valuestring, strlwr(TYPE_NAME)) != 0)
+            && (type != WIFI_COMM_TYPE_HTTP && type != WIFI_COMM_TYPE_TCP)) return;
 
     cJSON *json_send = cJSON_CreateObject();
     //mac字段
