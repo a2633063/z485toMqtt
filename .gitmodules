@@ -1,0 +1,3 @@
+[submodule "app/zlib"]
+	path = app/zlib
+	url = git@github.com:a2633063/ESP8266_zlib.git

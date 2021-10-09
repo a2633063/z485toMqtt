@@ -8,7 +8,7 @@
 #include "user_uart.h"
 
 #define UART_REC_DELAY   80 //多长时间内接收到的数据为一包,单位ms
-#define UART_REC_BUFF_MAX 512
+#define UART_REC_BUFF_MAX 200
 static uint8_t re_data[UART_REC_BUFF_MAX];
 static uint16_t re_num = 0;
 
@@ -22,10 +22,23 @@ static uint16_t re_num = 0;
 static os_timer_t _timer_uart;
 static void _uart_timer_fun(void *arg)
 {
-    if(!zlib_mqtt_send_byte(user_mqtt_get_state_topic(), re_data, re_num, 1, 0))
+    uint16_t i;
+    char send_str[UART_REC_BUFF_MAX * 2] = { 0 };
+    char *p = send_str;
+    for (i = 0; i < re_num; i++)
     {
-        zlib_udp_reply(NULL,re_data,re_num);
+        os_sprintf(p, "%02X", re_data[i]);
+        p += 2;
     }
+    *p = 0;
+    if(!zlib_mqtt_send_byte(user_mqtt_get_state_topic(), send_str, os_strlen(send_str), 1, 0))
+    {
+        zlib_udp_reply(NULL, send_str, os_strlen(send_str));
+    }
+//    if(!zlib_mqtt_send_byte(user_mqtt_get_state_topic(), re_data, re_num, 1, 0))
+//    {
+//        zlib_udp_reply(NULL,re_data,re_num);
+//    }
     re_num = 0;
 }
 void ICACHE_FLASH_ATTR user_uart_receive(uint8_t dat)
@@ -34,7 +47,7 @@ void ICACHE_FLASH_ATTR user_uart_receive(uint8_t dat)
 
     re_data[re_num] = dat;
     re_num++;
-    if(re_num>=UART_REC_BUFF_MAX)
+    if(re_num >= UART_REC_BUFF_MAX)
     {
         _uart_timer_fun(NULL);
     }

@@ -19,10 +19,61 @@ static char topic_set[MAX_MQTT_TOPIC_SIZE];
 static char topic_sensor[MAX_MQTT_TOPIC_SIZE];
 static char willtopic[MAX_MQTT_TOPIC_SIZE];
 
+static int16_t ICACHE_FLASH_ATTR char2nibble(char c)
+{
+    if(c >= '0' && c <= '9')
+        return c - '0';
+    else if(c >= 'A' && c <= 'F')
+        return c - 'A' + 0xA;
+    else if(c >= 'a' && c <= 'f') return c - 'a' + 0xa;
+
+    return -1;
+}
+/**
+ * 函  数  名: _user_mqtt_received_cb
+ * 函数说明: mqtt接受数据回调函数
+ * 参        数: 无
+ * 返        回: true:继续处理json数据      false:不继续处理json数据
+ */
 bool ICACHE_FLASH_ATTR _user_mqtt_received_cb(uint32_t *arg, const char* topic, uint32_t topic_len, const char *data,
         uint32_t data_len)
 {
-    if(os_strlen(data) > 0) zlib_mqtt_send_message(topic, "", 1, 1);
+    //if(os_strlen(data) > 0) zlib_mqtt_send_message(topic, "", 1, 1);
+    uint32_t i;
+    int16_t val;
+    uint8_t *send_buf = NULL;
+    uint8_t *send_p;
+    char *dat = data;
+
+    if(*data != '{')
+    {
+        send_buf = (uint8_t *) os_zalloc((data_len+1)/2);
+        if(send_buf == NULL)
+        {
+            os_printf("memery os_zalloc ERROR!\r\n");
+            os_free(send_buf);
+            return true;
+        }
+        os_memset(send_buf, 0, (data_len + 1) / 2);
+        send_p = send_buf;
+        for (i = 0; i < data_len && *dat != '\0'; i++)
+        {
+            val = char2nibble(*dat);
+            if(val == -1)
+            {
+                os_free(send_buf);
+                return true;
+            }
+            *send_p = ((*send_p) << 4) | val;
+            if(i % 2 == 1) send_p++;
+            dat++;
+        }
+        uart0_tx_buffer(send_buf, (data_len + 1) / 2);
+
+        os_free(send_buf);
+        return false;
+    }
+
     return true;
 }
 

@@ -18,12 +18,12 @@
 //#define ZLIB_WIFI_STATE_LED_IO_FUNC    FUNC_GPIO2
 
 #define ZLIB_WEB_CONFIG_ONLY  (1)  //若使用了自定义webserver 此应该设置为0 若仅用web配网 此置1 且调用zlib_web_wifi_init即可
-#define VERSION "v0.0.2"
+#define VERSION "v0.0.1"
 
-#define TYPE 99
+#define TYPE 12
 
-#define TYPE_NAME "zC1"
-#define DEVICE_NAME "zC1_%s"
+#define TYPE_NAME "z485toMqtt"
+#define DEVICE_NAME "z485toMqtt_%s"
 
 
 #define USER_CONFIG_VERSION 1
