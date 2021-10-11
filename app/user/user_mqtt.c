@@ -69,7 +69,7 @@ bool ICACHE_FLASH_ATTR _user_mqtt_received_cb(uint32_t *arg, const char* topic, 
             dat++;
         }
         uart0_tx_buffer(send_buf, (data_len + 1) / 2);
-
+        os_printf("Uart0 send hex: %s\r\n",data);
         os_free(send_buf);
         return false;
     }

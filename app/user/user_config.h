@@ -13,12 +13,13 @@
 
 #define ZLIB_UDP_REPLY_PORT  (10181)  //udp回复默认端口号
 #define ZLIB_WIFI_CONNECTED_STATE_LED  (1)  //wifi连接后 wifi状态指示灯io口电平
-//#define ZLIB_WIFI_STATE_LED_IO_MUX     PERIPHS_IO_MUX_GPIO2_U
-//#define ZLIB_WIFI_STATE_LED_IO_NUM     2
-//#define ZLIB_WIFI_STATE_LED_IO_FUNC    FUNC_GPIO2
+
+#define ZLIB_WIFI_STATE_LED_IO_MUX     PERIPHS_IO_MUX_GPIO2_U
+#define ZLIB_WIFI_STATE_LED_IO_NUM     2
+#define ZLIB_WIFI_STATE_LED_IO_FUNC    FUNC_GPIO2
 
 #define ZLIB_WEB_CONFIG_ONLY  (1)  //若使用了自定义webserver 此应该设置为0 若仅用web配网 此置1 且调用zlib_web_wifi_init即可
-#define VERSION "v0.0.1"
+#define VERSION "v0.0.2"
 
 #define TYPE 12
 
