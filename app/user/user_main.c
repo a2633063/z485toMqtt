@@ -16,6 +16,8 @@ void ICACHE_FLASH_ATTR _ota_result_cb(state_ota_result_state_t b)
     os_printf("_ota_result_cb: %d\r\n", b);
 }
 
+//void ICACHE_FLASH_ATTR system_init_done(void){}
+
 void user_init(void)
 {
     uint8_t i;
@@ -26,7 +28,7 @@ void user_init(void)
     os_printf("FW version:%s\n", VERSION);
 
     os_printf("Set UART0 Port to IO13(Rx) IO15(Tx)\n");
-    os_printf("Set Print Port to USART1 IO14\n");
+    os_printf("Set Print Port to USART1 IO2\n");
     system_uart_swap();
     UART_SetPrintPort(1);// 调试串口改为串口1
 
@@ -34,7 +36,7 @@ void user_init(void)
     os_printf("SDK version:%s\n", system_get_sdk_version());
     os_printf("FW version:%s\n", VERSION);
     os_printf("Set UART0 Port to IO13(Rx) IO15(Tx)\n");
-    os_printf("Set Print Port to USART1 IO14\n");
+    os_printf("Set Print Port to USART1 IO2\n");
 
     zlib_setting_get_config(&user_config, sizeof(user_config_t));
     if(user_config.version != USER_CONFIG_VERSION)
@@ -66,5 +68,6 @@ void user_init(void)
     zlib_tcp_init(10182);
     zlib_ota_set_result_callback(_ota_result_cb);
 
+    //system_init_done_cb(system_init_done);
 
 }

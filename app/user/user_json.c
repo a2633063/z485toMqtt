@@ -56,6 +56,12 @@ static void ICACHE_FLASH_ATTR _json_deal_cb(void *arg, Wifi_Comm_type_t type, cJ
     //mac字段
     cJSON_AddStringToObject(json_send, "mac", zlib_wifi_get_mac_str());
 
+    //version版本
+    cJSON *p_version = cJSON_GetObjectItem(pJsonRoot, "version");
+    if(p_version)
+    {
+        cJSON_AddStringToObject(json_send, "version", VERSION);
+    }
     //重启命令
     if(p_cmd && cJSON_IsString(p_cmd) && strcmp(p_cmd->valuestring, "restart") == 0)
     {

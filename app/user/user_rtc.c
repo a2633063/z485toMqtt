@@ -8,9 +8,14 @@
 
 void _user_rtc_fun(const struct_time_t time)
 {
-    LOGI("%04d/%02d/%02d %d %02d:%02d:%02d\n", time.year, time.month, time.day, time.week, time.hour, time.minute,
-            time.second);
-
+    static uint8_t minute_last = 80;
+    if(minute_last != time.minute)
+    {
+        minute_last = time.minute;
+        LOGI("%04d/%02d/%02d %d %02d:%02d:%02d\n", time.year, time.month, time.day, time.week, time.hour, time.minute,
+                time.second);
+    }
+	
     static uint32_t size_last;
     uint32_t size;
     size = system_get_free_heap_size();
