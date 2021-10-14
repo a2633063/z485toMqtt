@@ -9,6 +9,7 @@
 #include "user_json.h"
 #include "user_key.h"
 #include "user_setting.h"
+#include "user_rtc.h"
 
 user_config_t user_config;
 

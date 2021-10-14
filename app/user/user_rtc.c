@@ -5,6 +5,7 @@
 #include "user_config.h"
 #include "zlib.h"
 #include "zlib_rtc.h"
+#include "user_function.h"
 
 void _user_rtc_fun(const struct_time_t time)
 {
