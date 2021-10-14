@@ -28,7 +28,6 @@ void user_init(void)
     os_printf(" \n \nStart user%d.bin\n", system_upgrade_userbin_check() + 1);
     os_printf("SDK version:%s\n", system_get_sdk_version());
     os_printf("FW version:%s\n", VERSION);
-    os_printf("system_get_free_heap_size:%d\n", system_get_free_heap_size());
     os_printf("Set UART0 Port to IO13(Rx) IO15(Tx)\n");
     os_printf("Set Print Port to USART1 IO2\n");
     //system_uart_swap();
@@ -43,11 +42,10 @@ void user_init(void)
     os_printf("system_get_free_heap_size:%d\n", system_get_free_heap_size());
     user_setting_init();
 
-    os_printf("system_get_free_heap_size:%d\n", system_get_free_heap_size());
 
     zlib_wifi_init(false);
-    //todo 解决占用内存过大的问题
-    //zlib_web_config_init();
+    zlib_web_config_init();
+
     user_mqtt_init();
     user_json_init();
     user_rtc_init();
@@ -56,6 +54,7 @@ void user_init(void)
     zlib_udp_init(10182);
     zlib_tcp_init(10182);
     zlib_ota_set_result_callback(_ota_result_cb);
+
 
     //system_init_done_cb(system_init_done);
 

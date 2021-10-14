@@ -26,6 +26,7 @@
 #define TYPE_NAME "z485toMqtt"
 #define DEVICE_NAME "z485toMqtt_%s"
 
+#define UART_REC_BUFF_MAX 200
 
 #define USER_CONFIG_VERSION 2
 

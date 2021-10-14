@@ -9,7 +9,7 @@
 #include "user_function.h"
 
 #define UART_REC_DELAY   80 //多长时间内接收到的数据为一包,单位ms
-#define UART_REC_BUFF_MAX 200
+
 static uint8_t re_data[UART_REC_BUFF_MAX];  //当前接收到的数据
 static uint16_t re_num = 0;
 

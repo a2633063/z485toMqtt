@@ -6,6 +6,7 @@
 #include "user_config.h"
 #include "zlib.h"
 #include "mqtt_msg.h"
+#include "user_function.h"
 
 #define MAX_MQTT_TOPIC_SIZE         (64)
 
@@ -19,16 +20,7 @@ static char topic_set[MAX_MQTT_TOPIC_SIZE];
 static char topic_sensor[MAX_MQTT_TOPIC_SIZE];
 static char willtopic[MAX_MQTT_TOPIC_SIZE];
 
-static int16_t ICACHE_FLASH_ATTR char2nibble(char c)
-{
-    if(c >= '0' && c <= '9')
-        return c - '0';
-    else if(c >= 'A' && c <= 'F')
-        return c - 'A' + 0xA;
-    else if(c >= 'a' && c <= 'f') return c - 'a' + 0xa;
 
-    return -1;
-}
 /**
  * 函  数  名: _user_mqtt_received_cb
  * 函数说明: mqtt接受数据回调函数

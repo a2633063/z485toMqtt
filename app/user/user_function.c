@@ -8,6 +8,17 @@
 #include "key.h"
 #include "user_uart.h"
 
+int16_t ICACHE_FLASH_ATTR char2nibble(char c)
+{
+    if(c >= '0' && c <= '9')
+        return c - '0';
+    else if(c >= 'A' && c <= 'F')
+        return c - 'A' + 0xA;
+    else if(c >= 'a' && c <= 'f') return c - 'a' + 0xa;
+
+    return -1;
+}
+
 void ICACHE_FLASH_ATTR user_fun_send_wol(uint8_t mac[6], uint8_t ip[4], uint16_t port, uint8_t secure[6])
 {
     uint8_t i, j, length = 108;
@@ -53,9 +64,9 @@ void ICACHE_FLASH_ATTR user_fun_task_deal(user_config_task_t *task)
     {
         case TASK_TYPE_MQTT:    //mqtt数据
         {
-            if(task->data.mqtt.reserved - 1 < re_num)
+            if(task->data.mqtt.reserved > 0 && task->data.mqtt.reserved <= re_num)
             {
-                os_sprintf(payload, task->data.mqtt.payload, re_data[task->data.mqtt.reserved]);
+                os_sprintf(payload, task->data.mqtt.payload, *(re_data+task->data.mqtt.reserved-1));
             }
             else
             {

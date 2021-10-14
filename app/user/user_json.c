@@ -28,7 +28,9 @@ static void _json_timer_fun(void *arg)
 bool ICACHE_FLASH_ATTR _json_json_to_task(cJSON * p_task, user_config_task_t * task)
 {
     uint8_t i;
+    int16_t val;
     bool return_flag = false;
+    char *p;
     //设置名称
     cJSON *p_name = cJSON_GetObjectItem(p_task, "name");
     if(cJSON_IsString(p_name))        //cJSON_IsXxxx中已经判断是否为NULL
@@ -49,7 +51,7 @@ bool ICACHE_FLASH_ATTR _json_json_to_task(cJSON * p_task, user_config_task_t * t
     cJSON *p_task_type = cJSON_GetObjectItem(p_task, "type");
     if(!cJSON_IsNumber(p_task_type) || p_task_type->valueint >= TASK_TYPE_MAX) goto EXIT;
 
-    cJSON *p_task_dat_uart = cJSON_GetObjectItem(p_task, "uart");
+    cJSON *p_task_dat_uart = cJSON_GetObjectItem(p_task, "uart_dat");
     cJSON *p_task_mqtt_send = cJSON_GetObjectItem(p_task, "mqtt_send");
     cJSON *p_task_reserved = cJSON_GetObjectItem(p_task, "reserved");
     cJSON *p_task_hour = cJSON_GetObjectItem(p_task, "hour");
@@ -80,31 +82,38 @@ bool ICACHE_FLASH_ATTR _json_json_to_task(cJSON * p_task, user_config_task_t * t
             //确认触发条件
             if(p_task_type->valueint == TASK_TYPE_MQTT)
             {
-                if(!cJSON_IsArray(p_task_dat_uart)) goto EXIT;
+                if(!cJSON_IsString(p_task_dat_uart)) goto EXIT;
                 //TASK_TYPE_MQTT,更新dat_length condition_dat reserved字段
-                task->dat_length = cJSON_GetArraySize(p_task_dat_uart);
-                for (i = 0; i < task->dat_length && i < TASK_DATA_REC_BUF_LENGTH; i++)
-                    task->condition_dat[i] = cJSON_GetArrayItem(p_task_dat_uart, i)->valueint;
+                //更新dat_length及condition_dat
+                p = p_task_dat_uart->valuestring;
+                task->dat_length = 0;
+                task->condition_dat[0] = 0;
+                for (i = 0; *p != '\0' && task->dat_length < TASK_DATA_REC_BUF_LENGTH; i++, p++)
+                {
+                    val = char2nibble(*p);
+                    if(val < 0) break;
+                    task->condition_dat[task->dat_length] = (task->condition_dat[task->dat_length] << 4) | val;
+                    if(i % 2 == 1)
+                    {
+                        task->dat_length++;
+                        task->condition_dat[task->dat_length] = 0;
+                    }
+                }
+                //更新reserved
+                task->reserved = 255;
                 if(cJSON_IsNumber(p_task_reserved))
                 {
                     task->reserved = p_task_reserved->valueint;
                 }
-                else
-                {
-                    task->reserved = 255;
-                }
 
                 //解析mqtt_send
+                task->mqtt_send = 0;
                 if(cJSON_IsNumber(p_task_mqtt_send)
                         && (p_task_mqtt_send->valueint == 1 || p_task_mqtt_send->valueint == 0))
                 {
                     task->mqtt_send = p_task_mqtt_send->valueint;
-                    return_flag = true;
                 }
-                else
-                {
-                    task->mqtt_send = 0;
-                }
+
             }
             else if(p_task_type->valueint == TASK_TYPE_TIME_MQTT)
             {
@@ -215,16 +224,28 @@ bool ICACHE_FLASH_ATTR _json_json_to_task(cJSON * p_task, user_config_task_t * t
             cJSON *p_task_uart_reserved_send = cJSON_GetObjectItem(p_task_uart, "reserved_send");
 
             //确认执行条件
-            if(!cJSON_IsArray(p_task_uart_uart) || cJSON_GetArraySize(p_task_uart_uart) < 1) goto EXIT;
+            if(!cJSON_IsString(p_task_uart_uart)) goto EXIT;
 
             //确认触发条件
             if(p_task_type->valueint == TASK_TYPE_UART)
             {
                 if(!cJSON_IsArray(p_task_dat_uart)) goto EXIT;
                 //TASK_TYPE_MQTT,更新dat_length condition_dat reserved mqtt_send字段
-                task->dat_length = cJSON_GetArraySize(p_task_dat_uart);
-                for (i = 0; i < task->dat_length && i < TASK_DATA_REC_BUF_LENGTH; i++)
-                    task->condition_dat[i] = cJSON_GetArrayItem(p_task_dat_uart, i)->valueint;
+                p = p_task_dat_uart->valuestring;
+                task->dat_length = 0;
+                task->condition_dat[0] = 0;
+                for (i = 0; *p != '\0' && task->dat_length < TASK_DATA_REC_BUF_LENGTH; i++, p++)
+                {
+                    val = char2nibble(*p);
+                    if(val < 0) break;
+                    task->condition_dat[task->dat_length] = (task->condition_dat[task->dat_length] << 4) | val;
+                    if(i % 2 == 1)
+                    {
+                        task->dat_length++;
+                        task->condition_dat[task->dat_length] = 0;
+                    }
+                }
+
                 if(cJSON_IsNumber(p_task_reserved))
                 {
                     task->reserved = p_task_reserved->valueint;
@@ -259,9 +280,21 @@ bool ICACHE_FLASH_ATTR _json_json_to_task(cJSON * p_task, user_config_task_t * t
             task->type = p_task_type->valueint;
             return_flag = true;
 
-            task->data.uart.dat_length = cJSON_GetArraySize(p_task_uart_uart);
-            for (i = 0; i < task->data.uart.dat_length && i < TASK_DATA_MESSAGE_LENGTH; i++)
-                task->data.uart.dat[i] = cJSON_GetArrayItem(p_task_uart_uart, i)->valueint;
+            p = p_task_uart_uart->valuestring;
+            task->data.uart.dat_length = 0;
+            task->data.uart.dat[0] = 0;
+            for (i = 0; *p != '\0' && task->data.uart.dat_length < TASK_DATA_MESSAGE_LENGTH; i++, p++)
+            {
+                val = char2nibble(*p);
+                if(val < 0) break;
+                task->data.uart.dat[task->data.uart.dat_length] = (task->data.uart.dat[task->data.uart.dat_length] << 4)
+                        | val;
+                if(i % 2 == 1)
+                {
+                    task->data.uart.dat_length++;
+                    task->data.uart.dat[task->data.uart.dat_length] = 0;
+                }
+            }
 
             task->data.uart.reserved_rec = 255;
             task->data.uart.reserved_send = 255;
@@ -291,8 +324,10 @@ bool ICACHE_FLASH_ATTR _json_json_to_task(cJSON * p_task, user_config_task_t * t
  */
 bool ICACHE_FLASH_ATTR _json_task_to_json(user_config_task_t * task, cJSON * p_task)
 {
-    uint8_t i;
+    uint16_t i;
     cJSON *p_json_array;
+    char send_str[TASK_DATA_MESSAGE_LENGTH * 2 + 1] = { 0 };
+    char *p = send_str;
 
     cJSON_AddStringToObject(p_task, "name", task->name);
     cJSON_AddNumberToObject(p_task, "type", task->type);
@@ -301,12 +336,16 @@ bool ICACHE_FLASH_ATTR _json_task_to_json(user_config_task_t * task, cJSON * p_t
     if(task->type == TASK_TYPE_MQTT || task->type == TASK_TYPE_WOL || task->type == TASK_TYPE_UART)
     {        //串口触发
         cJSON_AddNumberToObject(p_task, "mqtt_send", task->mqtt_send);
-        p_json_array = cJSON_CreateArray();
-        for (i = 0; i < task->dat_length && i < TASK_DATA_REC_BUF_LENGTH; i++)
-            cJSON_AddItemToArray(p_json_array, cJSON_CreateNumber(task->condition_dat[i]));
-        cJSON_AddItemToObject(p_task, "uart", p_json_array);
 
-        if(task->reserved - 1 < task->dat_length)
+        for (i = 0; i < task->dat_length && i < TASK_DATA_REC_BUF_LENGTH; i++)
+        {
+            os_sprintf(p, "%02X", task->condition_dat[i]);
+            p += 2;
+        }
+        *p = 0;
+        cJSON_AddStringToObject(p_task, "uart_dat", send_str);
+
+        if(task->reserved > 0 && task->reserved <= task->dat_length)
         {
             cJSON_AddNumberToObject(p_task, "reserved", task->reserved);
         }
@@ -383,10 +422,13 @@ bool ICACHE_FLASH_ATTR _json_task_to_json(user_config_task_t * task, cJSON * p_t
         {
             cJSON *p_task_uart = cJSON_CreateObject();
 
-            p_json_array = cJSON_CreateArray();
             for (i = 0; i < task->data.uart.dat_length && i < TASK_DATA_MESSAGE_LENGTH; i++)
-                cJSON_AddItemToArray(p_json_array, cJSON_CreateNumber(task->data.uart.dat[i]));
-            cJSON_AddItemToObject(p_task_uart, "uart", p_json_array);
+            {
+                os_sprintf(p, "%02X", task->data.uart.dat[i]);
+                p += 2;
+            }
+            *p = 0;
+            cJSON_AddStringToObject(p_task_uart, "uart", send_str);
 
             if(task->type == TASK_TYPE_UART && task->data.uart.reserved_send - 1 < task->data.uart.dat_length
                     && task->data.uart.reserved_rec - 1 < 254)
@@ -474,7 +516,7 @@ static void ICACHE_FLASH_ATTR _json_deal_cb(void *arg, Wifi_Comm_type_t type, cJ
     }
 
     //解析
-    cJSON *p_name = cJSON_GetObjectItem(pJsonRoot, "name");
+    //cJSON *p_name = cJSON_GetObjectItem(pJsonRoot, "name");
     cJSON *p_mac = cJSON_GetObjectItem(pJsonRoot, "mac");
 
     if((p_mac && cJSON_IsString(p_mac) && os_strcmp(p_mac->valuestring, zlib_wifi_get_mac_str()) != 0)
@@ -513,6 +555,26 @@ static void ICACHE_FLASH_ATTR _json_deal_cb(void *arg, Wifi_Comm_type_t type, cJ
         {
             cJSON_AddStringToObject(json_send, "ssid", "get wifi_ssid fail");
         }
+    }
+
+    //查询上一次串口接收到的内容
+    cJSON *p_uart_last = cJSON_GetObjectItem(pJsonRoot, "uart_last");
+    if(p_uart_last)
+    {
+        uint16_t re_num;
+        uint8_t * re_data;
+        re_data = user_uart_get_data(&re_num);
+
+        char send_str[UART_REC_BUFF_MAX * 2 + 1] = { 0 };
+        char *p = send_str;
+        for (i = 0; i < re_num; i++)
+        {
+            os_sprintf(p, "%02X", re_data[i]);
+            p += 2;
+        }
+        *p = 0;
+        cJSON_AddStringToObject(json_send, "uart_last", send_str);
+
     }
 
     cJSON *p_setting = cJSON_GetObjectItem(pJsonRoot, "setting");
