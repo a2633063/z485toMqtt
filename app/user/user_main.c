@@ -8,6 +8,7 @@
 #include "zlib_rtc.h"
 #include "user_json.h"
 #include "user_key.h"
+#include "user_setting.h"
 
 user_config_t user_config;
 
@@ -26,11 +27,11 @@ void user_init(void)
     os_printf(" \n \nStart user%d.bin\n", system_upgrade_userbin_check() + 1);
     os_printf("SDK version:%s\n", system_get_sdk_version());
     os_printf("FW version:%s\n", VERSION);
-
+    os_printf("system_get_free_heap_size:%d\n", system_get_free_heap_size());
     os_printf("Set UART0 Port to IO13(Rx) IO15(Tx)\n");
     os_printf("Set Print Port to USART1 IO2\n");
-    system_uart_swap();
-    UART_SetPrintPort(1);// 调试串口改为串口1
+    //system_uart_swap();
+    //UART_SetPrintPort(1);// 调试串口改为串口1
 
     os_printf(" \n \nStart user%d.bin\n", system_upgrade_userbin_check() + 1);
     os_printf("SDK version:%s\n", system_get_sdk_version());
@@ -38,27 +39,14 @@ void user_init(void)
     os_printf("Set UART0 Port to IO13(Rx) IO15(Tx)\n");
     os_printf("Set Print Port to USART1 IO2\n");
 
-    zlib_setting_get_config(&user_config, sizeof(user_config_t));
-    if(user_config.version != USER_CONFIG_VERSION)
-    {
-        char hwaddr[6];
-        char strMac[16];
-        //恢复默认设置
-        wifi_get_macaddr(STATION_IF, hwaddr);
-        os_sprintf(strMac, "%02x%02x%02x%02x%02x%02x", MAC2STR(hwaddr));
-        os_sprintf(user_config.name, DEVICE_NAME, strMac + 8);
-        os_sprintf(user_config.mqtt_ip, "");
-        os_sprintf(user_config.mqtt_user, "");
-        os_sprintf(user_config.mqtt_password, "");
-        user_config.mqtt_port = 1883;
-        user_config.version = USER_CONFIG_VERSION;
-        os_printf("config version error.Restore default settings\n");
-        zlib_setting_save_config(&user_config, sizeof(user_config_t));
-    }
+    os_printf("system_get_free_heap_size:%d\n", system_get_free_heap_size());
+    user_setting_init();
+
+    os_printf("system_get_free_heap_size:%d\n", system_get_free_heap_size());
 
     zlib_wifi_init(false);
-
-    zlib_web_config_init();
+    //todo 解决占用内存过大的问题
+    //zlib_web_config_init();
     user_mqtt_init();
     user_json_init();
     user_rtc_init();
