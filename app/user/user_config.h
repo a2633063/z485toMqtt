@@ -19,7 +19,7 @@
 #define ZLIB_WIFI_STATE_LED_IO_FUNC    FUNC_GPIO5
 
 #define ZLIB_WEB_CONFIG_ONLY  (1)  //若使用了自定义webserver 此应该设置为0 若仅用web配网 此置1 且调用zlib_web_wifi_init即可
-#define VERSION "v0.0.4"
+#define VERSION "v0.0.5"
 
 #define TYPE 12
 
