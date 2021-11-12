@@ -28,15 +28,15 @@ void user_init(void)
     os_printf(" \n \nStart user%d.bin\n", system_upgrade_userbin_check() + 1);
     os_printf("SDK version:%s\n", system_get_sdk_version());
     os_printf("FW version:%s\n", VERSION);
-    os_printf("Set UART0 Port to IO13(Rx) IO15(Tx)\n");
+    //os_printf("Set UART0 Port to IO13(Rx) IO15(Tx)\n");
     os_printf("Set Print Port to USART1 IO2\n");
     //system_uart_swap();
-    //UART_SetPrintPort(1);// 调试串口改为串口1
+    UART_SetPrintPort(1);// 调试串口改为串口1
 
     os_printf(" \n \nStart user%d.bin\n", system_upgrade_userbin_check() + 1);
     os_printf("SDK version:%s\n", system_get_sdk_version());
     os_printf("FW version:%s\n", VERSION);
-    os_printf("Set UART0 Port to IO13(Rx) IO15(Tx)\n");
+    //os_printf("Set UART0 Port to IO13(Rx) IO15(Tx)\n");
     os_printf("Set Print Port to USART1 IO2\n");
 
     os_printf("system_get_free_heap_size:%d\n", system_get_free_heap_size());
