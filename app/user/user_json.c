@@ -343,7 +343,7 @@ bool ICACHE_FLASH_ATTR _json_task_to_json(user_config_task_t * task, cJSON * p_t
     {        //串口触发
         cJSON_AddNumberToObject(p_task, "mqtt_send", task->mqtt_send);
         p = send_str;
-        os_memset(send_str,0,sizeof(send_str));
+        os_memset(send_str, 0, sizeof(send_str));
         for (i = 0; i < task->dat_length && i < TASK_DATA_REC_BUF_LENGTH; i++)
         {
             os_sprintf(p, "%02X", task->condition_dat[i]);
@@ -429,7 +429,7 @@ bool ICACHE_FLASH_ATTR _json_task_to_json(user_config_task_t * task, cJSON * p_t
         {
             cJSON *p_task_uart = cJSON_CreateObject();
             p = send_str;
-            os_memset(send_str,0,sizeof(send_str));
+            os_memset(send_str, 0, sizeof(send_str));
             for (i = 0; i < task->data.uart.dat_length && i < TASK_DATA_MESSAGE_LENGTH; i++)
             {
                 os_sprintf(p, "%02X", task->data.uart.dat[i]);
@@ -521,6 +521,7 @@ static void ICACHE_FLASH_ATTR _json_deal_cb(void *arg, Wifi_Comm_type_t type, cJ
 
         cJSON_free((void *) s);
         cJSON_Delete(pRoot);
+        return;
     }
 
     //解析
