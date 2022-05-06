@@ -9,7 +9,7 @@
 #include "user_key.h"
 
 
-void ICACHE_FLASH_ATTR user_key_init(void)
+void ICACHE_FLASH_ATTR user_led_init(void)
 {
 
 }
